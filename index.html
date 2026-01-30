@@ -10,46 +10,56 @@
         :root { --forest-green: #2D402E; --ivory: #F3F0E7; }
         
         body, html { 
-            margin: 0; padding: 0; 
-            width: 100%; height: 100%;
+            margin: 0; padding: 0; width: 100%; height: 100%;
             background-color: var(--ivory); 
             font-family: 'Cormorant Garamond', serif;
-            display: flex;
-            justify-content: center;
-            align-items: center; /* 画面の垂直中央に配置 */
-            overflow: hidden; /* 演出中は余計なスクロールを防止 */
+            overflow: hidden; /* 演出中は勝手に動かないように固定 */
         }
 
-        /* 封筒とカードを囲むメインコンテナ */
-        .envelope-system {
+        /* 全体の配置：画面の真ん中を基準にする */
+        .viewport {
             position: relative;
-            width: 320px;
-            height: 220px;
-            /* 重要：この枠の下にはみ出るものをすべて隠す */
-            overflow: visible; 
+            width: 100%; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* 物理的にはみ出しをカットするためのクリッピングコンテナ */
-        .clipper {
+        /* 招待状カード */
+        .card {
             position: absolute;
-            top: -400px; /* カードが上がるスペース */
-            left: -20px;
-            width: 360px;
-            height: 620px; /* 400(カード) + 220(封筒) */
-            overflow: hidden; /* ここで底をカットします */
-            padding: 20px;
+            bottom: 0; /* 最初は封筒の中に隠れる位置 */
+            width: 300px; height: 500px;
+            background: var(--ivory);
+            border: 1px solid var(--forest-green);
+            z-index: 5;
+            padding: 30px 15px;
+            box-sizing: border-box;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            /* アニメーション：画面中央までせり上がる */
+            animation: slideToCenter 2s forwards 2.5s;
+        }
+
+        @keyframes slideToCenter {
+            /* 画面中央に収まるようにマイナス値を調整 */
+            to { transform: translateY(-120px); }
+        }
+
+        /* 封筒アッセンブリ */
+        .envelope {
+            position: relative;
+            width: 320px; height: 220px;
+            z-index: 10;
         }
 
         .env-back {
-            position: absolute; bottom: 0; left: 20px;
-            width: 320px; height: 220px;
+            position: absolute; width: 100%; height: 100%;
             background: var(--forest-green);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             z-index: 1;
         }
 
         .flap {
-            position: absolute; bottom: 90px; left: 20px; /* 220px(封筒) - 130px(蓋) */
+            position: absolute; top: 0; left: 0;
             width: 0; height: 0;
             border-left: 160px solid transparent;
             border-right: 160px solid transparent;
@@ -59,66 +69,56 @@
             animation: openFlap 1s forwards 1s;
         }
 
+        @keyframes openFlap {
+            to { transform: rotateX(180deg); z-index: 1; }
+        }
+
         .env-front {
-            position: absolute; bottom: 0; left: 20px;
-            width: 320px; height: 220px;
+            position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--forest-green);
             clip-path: polygon(0 35%, 100% 35%, 100% 100%, 0 100%);
             z-index: 8;
         }
 
-        .card {
+        /* 【重要】底のはみ出しを物理的に隠すガード */
+        .bottom-guard {
             position: absolute;
-            bottom: -380px; /* 最初はクリッパーの枠外（下）に隠す */
-            left: 30px;
-            width: 300px;
-            height: 550px;
-            background: var(--ivory);
-            border: 1px solid var(--forest-green);
-            z-index: 5;
-            padding: 40px 15px;
-            box-sizing: border-box;
-            text-align: center;
-            animation: slideUp 2s forwards 2.5s;
+            bottom: -500px; left: -20px;
+            width: 360px; height: 500px;
+            background-color: var(--ivory); /* 背景と同じ色で隠す */
+            z-index: 9;
         }
 
-        @keyframes openFlap {
-            to { transform: rotateX(180deg); z-index: 1; }
-        }
-
-        @keyframes slideUp {
-            /* 封筒の中からちょうど良い位置までせり出す */
-            to { transform: translateY(-400px); }
-        }
-
+        /* カード内部のデザイン */
         .card-inner {
             border: 1px solid var(--forest-green);
             outline: 3px double var(--forest-green);
             outline-offset: -8px;
             height: 100%;
-            padding: 20px 10px;
+            display: flex; flex-direction: column; justify-content: center;
         }
-
-        .names { font-size: 1.6rem; margin: 15px 0; color: var(--forest-green); }
-        .card-rsvp input, .card-rsvp select {
-            width: 100%; margin-bottom: 10px; padding: 8px;
-            border: none; border-bottom: 1px solid var(--forest-green);
-            background: transparent; font-family: inherit;
-        }
-        .btn { background: var(--forest-green); color: var(--ivory); border: none; padding: 10px 20px; font-weight: bold; }
+        .names { font-size: 1.6rem; margin: 15px 0; color: var(--forest-green); line-height: 1.2; }
+        .rsvp-form { margin-top: 20px; border-top: 1px solid var(--forest-green); padding-top: 20px; }
+        input, select { width: 100%; margin-bottom: 10px; padding: 8px; border: none; border-bottom: 1px solid var(--forest-green); background: transparent; font-family: inherit; font-size: 0.9rem; }
+        .btn { background: var(--forest-green); color: var(--ivory); border: none; padding: 10px 20px; font-weight: bold; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="envelope-system">
-        <div class="clipper">
+    <div class="viewport">
+        <div class="envelope">
+            <div class="flap"></div>
+            <div class="env-back"></div>
+            
             <div class="card">
                 <div class="card-inner">
                     <p style="font-size: 0.7rem; letter-spacing: 2px;">INVITATION</p>
                     <div class="names">GENEVIEVE<br>& CHARLES</div>
-                    <p>JUNE 14, 2026</p>
-                    <div class="card-rsvp">
-                        <p style="font-size: 1rem; letter-spacing: 2px; margin-bottom: 10px;">RSVP</p>
+                    <p style="font-size: 0.9rem;">JUNE 14, 2026</p>
+
+                    <div class="rsvp-form">
+                        <p style="font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 10px;">RSVP</p>
                         <input type="text" placeholder="Your Name">
                         <select>
                             <option value="">Attendance</option>
@@ -129,11 +129,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="flap"></div>
-        <div class="env-back"></div>
-        <div class="env-front"></div>
+
+            <div class="env-front"></div>
+            <div class="bottom-guard"></div> </div>
     </div>
 
 </body>
