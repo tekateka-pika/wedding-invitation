@@ -9,53 +9,47 @@
     <style>
         :root { --forest-green: #2D402E; --ivory: #F3F0E7; }
         
-        /* 画面全体のスクロールを許可し、はみ出しを隠す */
         body, html { 
             margin: 0; padding: 0; 
+            width: 100%; height: 100%;
             background-color: var(--ivory); 
             font-family: 'Cormorant Garamond', serif;
-            min-height: 100vh;
-        }
-
-        .main-container {
-            width: 100%;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* 封筒を最初から少し下げた位置に配置 */
-            padding-top: 35vh; 
-            padding-bottom: 100px;
+            justify-content: center;
+            align-items: center; /* 画面の垂直中央に配置 */
+            overflow: hidden; /* 演出中は余計なスクロールを防止 */
         }
 
-        /* 封筒の親要素（ここからはみ出さないようにする） */
+        /* 封筒とカードを囲むメインコンテナ */
         .envelope-system {
             position: relative;
             width: 320px;
             height: 220px;
-            z-index: 10;
+            /* 重要：この枠の下にはみ出るものをすべて隠す */
+            overflow: visible; 
         }
 
-        /* 封筒の背面 */
+        /* 物理的にはみ出しをカットするためのクリッピングコンテナ */
+        .clipper {
+            position: absolute;
+            top: -400px; /* カードが上がるスペース */
+            left: -20px;
+            width: 360px;
+            height: 620px; /* 400(カード) + 220(封筒) */
+            overflow: hidden; /* ここで底をカットします */
+            padding: 20px;
+        }
+
         .env-back {
-            position: absolute; width: 100%; height: 100%;
+            position: absolute; bottom: 0; left: 20px;
+            width: 320px; height: 220px;
             background: var(--forest-green);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             z-index: 1;
         }
 
-        /* 封筒の前面（底を物理的に閉じる） */
-        .env-front {
-            position: absolute; bottom: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--forest-green);
-            /* 下半分をしっかり覆う */
-            clip-path: polygon(0 35%, 100% 35%, 100% 100%, 0 100%);
-            z-index: 8;
-        }
-
-        /* 封筒の蓋 */
         .flap {
-            position: absolute; top: 0; left: 0;
+            position: absolute; bottom: 90px; left: 20px; /* 220px(封筒) - 130px(蓋) */
             width: 0; height: 0;
             border-left: 160px solid transparent;
             border-right: 160px solid transparent;
@@ -65,78 +59,66 @@
             animation: openFlap 1s forwards 1s;
         }
 
-        /* 招待状カード（RSVP含む） */
+        .env-front {
+            position: absolute; bottom: 0; left: 20px;
+            width: 320px; height: 220px;
+            background: var(--forest-green);
+            clip-path: polygon(0 35%, 100% 35%, 100% 100%, 0 100%);
+            z-index: 8;
+        }
+
         .card {
             position: absolute;
-            bottom: 10px; left: 10px;
+            bottom: -380px; /* 最初はクリッパーの枠外（下）に隠す */
+            left: 30px;
             width: 300px;
-            height: 550px; /* カードの高さ */
+            height: 550px;
             background: var(--ivory);
             border: 1px solid var(--forest-green);
             z-index: 5;
             padding: 40px 15px;
             box-sizing: border-box;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            /* アニメーション：画面中央付近まで上げる */
-            animation: slideToCenter 2s forwards 2.5s;
+            animation: slideUp 2s forwards 2.5s;
         }
 
         @keyframes openFlap {
             to { transform: rotateX(180deg); z-index: 1; }
         }
 
-        /* カードを適切な位置（画面中央）で止める */
-        @keyframes slideToCenter {
+        @keyframes slideUp {
+            /* 封筒の中からちょうど良い位置までせり出す */
             to { transform: translateY(-400px); }
         }
 
-        /* カード内部のデザイン */
         .card-inner {
             border: 1px solid var(--forest-green);
             outline: 3px double var(--forest-green);
             outline-offset: -8px;
             height: 100%;
-            padding: 30px 10px;
-            overflow-y: auto; /* 万が一入りきらない場合もカード内でスクロール可 */
+            padding: 20px 10px;
         }
 
         .names { font-size: 1.6rem; margin: 15px 0; color: var(--forest-green); }
-        
-        .card-rsvp {
-            margin-top: 30px;
-            border-top: 1px solid var(--forest-green);
-            padding-top: 20px;
-        }
-
         .card-rsvp input, .card-rsvp select {
             width: 100%; margin-bottom: 10px; padding: 8px;
             border: none; border-bottom: 1px solid var(--forest-green);
             background: transparent; font-family: inherit;
         }
-
-        .btn {
-            background: var(--forest-green); color: var(--ivory);
-            border: none; padding: 10px 20px; font-weight: bold; margin-top: 10px;
-        }
+        .btn { background: var(--forest-green); color: var(--ivory); border: none; padding: 10px 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <div class="envelope-system">
-            <div class="flap"></div>
-            <div class="env-back"></div>
-            
+    <div class="envelope-system">
+        <div class="clipper">
             <div class="card">
                 <div class="card-inner">
                     <p style="font-size: 0.7rem; letter-spacing: 2px;">INVITATION</p>
                     <div class="names">GENEVIEVE<br>& CHARLES</div>
                     <p>JUNE 14, 2026</p>
-                    <p style="font-size: 0.8rem; margin-top: 5px;">TUSCANY, ITALY</p>
-
                     <div class="card-rsvp">
-                        <p style="font-size: 1rem; letter-spacing: 2px; margin-bottom: 15px;">RSVP</p>
+                        <p style="font-size: 1rem; letter-spacing: 2px; margin-bottom: 10px;">RSVP</p>
                         <input type="text" placeholder="Your Name">
                         <select>
                             <option value="">Attendance</option>
@@ -147,9 +129,11 @@
                     </div>
                 </div>
             </div>
-
-            <div class="env-front"></div>
         </div>
+        
+        <div class="flap"></div>
+        <div class="env-back"></div>
+        <div class="env-front"></div>
     </div>
 
 </body>
