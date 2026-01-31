@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wedding Invitation - Elegant Fan</title>
+    <title>Wedding Invitation - Custom Fan</title>
     <link href="https://fonts.googleapis.com/css2?family=Water+Brush&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --black: #000000; --white: #FFFFFF; }
+        :root { --black: #1a1a1a; --white: #ffffff; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--white); font-family: 'Cormorant Garamond', serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
         .outer-frame {
@@ -24,39 +24,74 @@
             transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1); cursor: pointer; z-index: 10;
         }
 
-        /* 扇子の線画イラスト */
-        .fan-svg { width: 280px; height: auto; margin-bottom: 40px; }
-        .fan-outline { fill: none; stroke: var(--black); stroke-width: 0.8; }
-        .yc-path-text { font-family: 'Water Brush', cursive; font-size: 40px; fill: var(--black); }
+        /* 扇子画像コンテナ */
+        .fan-box {
+            position: relative;
+            width: 280px;
+            height: 180px;
+            margin-bottom: 20px;
+        }
 
-        .welcome-text { font-size: 1.6rem; color: var(--black); letter-spacing: 4px; font-weight: 400; text-align: center; }
+        /* 送っていただいた画像を背景として配置 */
+        .fan-img {
+            width: 100%;
+            height: 100%;
+            background-image: url('fan.png'); /* GitHub内の画像ファイル名に合わせてください */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* 扇子のカーブに馴染ませる名前の配置 */
+        .yc-name {
+            position: absolute;
+            top: 38%; /* 画像の扇面部分に重なるよう調整 */
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            font-family: 'Water Brush', cursive;
+            font-size: 2.8rem;
+            color: var(--black);
+            white-space: nowrap;
+            pointer-events: none; /* クリックを阻害しない */
+        }
+
+        .welcome-text { 
+            font-size: 1.5rem; 
+            color: var(--black); 
+            letter-spacing: 4px; 
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 400;
+        }
 
         /* Detail画面 */
         .detail-screen { opacity: 0; transition: opacity 0.5s ease; min-height: 100%; }
         
-        /* 詳細画面トップの画像 */
         .detail-hero-img {
-            width: 100%; height: 220px;
-            background-image: url('https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&q=80&w=1000');
+            width: 100%; height: 240px;
+            background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');
             background-size: cover; background-position: center;
         }
 
         .content-body { padding: 40px 25px; text-align: center; }
-        .section-title { font-size: 1.5rem; border-bottom: 1px solid var(--black); padding-bottom: 10px; margin-bottom: 30px; }
-        .info-block { margin-bottom: 35px; }
-        .info-block h3 { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .section-title { font-size: 1.6rem; border-bottom: 1px solid var(--black); padding-bottom: 10px; margin-bottom: 35px; letter-spacing: 2px; }
+        
+        .info-block { margin-bottom: 30px; }
+        .info-block h3 { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
+        .info-block p { font-size: 1.1rem; line-height: 1.6; margin: 0; }
 
-        /* フォーム */
         .rsvp-form { margin-top: 50px; border-top: 1px solid var(--black); padding-top: 40px; }
         input, select, textarea { 
             width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--black); 
             background: transparent; font-family: inherit; box-sizing: border-box; 
         }
-        .btn { background: var(--black); color: var(--white); border: none; padding: 18px; width: 100%; font-weight: bold; cursor: pointer; }
+        .btn { background: var(--black); color: var(--white); border: none; padding: 18px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
 
-        /* クラス切替 */
         .welcome-screen.hide { transform: translateY(-100%); }
         .detail-screen.show { opacity: 1; }
+        
+        .tap-hint { margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; opacity: 0.5; animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.1; } }
     </style>
 </head>
 <body>
@@ -65,52 +100,33 @@
         <div class="invitation-container" id="scrollContainer">
             
             <div class="welcome-screen" id="welcomeScreen">
-                <svg class="fan-svg" viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
-                    <path class="fan-outline" d="M150 160 L20 120 C 20 80, 60 20, 150 20 C 240 20, 280 80, 280 120 Z" />
-                    <line class="fan-outline" x1="150" y1="160" x2="60" y2="35" />
-                    <line class="fan-outline" x1="150" y1="160" x2="105" y2="22" />
-                    <line class="fan-outline" x1="150" y1="160" x2="150" y2="20" />
-                    <line class="fan-outline" x1="150" y1="160" x2="195" y2="22" />
-                    <line class="fan-outline" x1="150" y1="160" x2="240" y2="35" />
-                    
-                    <path id="nameCurve" d="M 60 90 Q 150 60 240 90" fill="transparent" />
-                    <text class="yc-path-text">
-                        <textPath href="#nameCurve" startOffset="50%" text-anchor="middle">
-                            Y & C
-                        </textPath>
-                    </text>
-                    <circle cx="150" cy="160" r="3" fill="black" />
-                </svg>
-
+                <div class="fan-box">
+                    <div class="fan-img"></div>
+                    <div class="yc-name">Y & C</div>
+                </div>
                 <div class="welcome-text">WELCOME TO<br>OUR WEDDING</div>
-                <p style="margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; opacity: 0.6;">Tap to Open</p>
+                <div class="tap-hint">TAP TO OPEN</div>
             </div>
 
             <div class="detail-screen" id="detailScreen">
                 <div class="detail-hero-img"></div>
-                
                 <div class="content-body">
                     <h2 class="section-title">Invitation</h2>
-                    
                     <div class="info-block">
                         <h3>Date</h3>
-                        <p>2026.06.14 SAT<br>15:00 Start</p>
+                        <p>Saturday, June 14, 2026<br>3:00 PM</p>
                     </div>
-
                     <div class="info-block">
-                        <h3>Location</h3>
-                        <p>The Terrace Tokyo<br>Minato-ku, Tokyo</p>
+                        <h3>Venue</h3>
+                        <p>The Grand Heritage<br>Aoyama, Tokyo</p>
                     </div>
-
                     <div class="rsvp-form">
-                        <h3 style="margin-bottom: 20px;">RSVP</h3>
-                        <input type="text" placeholder="Name">
+                        <input type="text" placeholder="Your Name">
                         <select>
                             <option value="" disabled selected>Attendance</option>
-                            <option value="yes">Attend</option>
-                            <option value="no">Decline</option>
+                            <option value="yes">Joyfully Accepts</option>
+                            <option value="no">Regretfully Declines</option>
                         </select>
-                        <textarea placeholder="Message" rows="3"></textarea>
                         <button class="btn">SEND RESPONSE</button>
                     </div>
                 </div>
@@ -121,7 +137,7 @@
 
     <script>
         document.getElementById('welcomeScreen').addEventListener('click', function() {
-            document.getElementById('welcomeScreen').classList.add('hide');
+            this.classList.add('hide');
             document.getElementById('detailScreen').classList.add('show');
             document.getElementById('scrollContainer').scrollTop = 0;
         });
