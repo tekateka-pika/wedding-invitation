@@ -17,24 +17,29 @@
             overflow: hidden;
         }
 
-        .viewport {
+        /* 全体のステージ */
+        .stage {
             position: relative;
-            width: 100%; height: 100%;
-            display: flex; justify-content: center;
-            padding-top: 15vh; /* 封筒を少し上に上げて、下のはみ出しを防止 */
+            width: 340px;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 2000px;
         }
 
-        /* --- 招待状カード（二つ折り） --- */
+        /* --- 招待状：二つ折り（封筒から独立） --- */
         .card-container {
             position: absolute;
-            top: 50px; /* 封筒の中の初期位置 */
-            width: 310px; height: 260px;
-            z-index: 5; /* 初期は封筒の中 */
+            top: 280px; /* 封筒の中の初期位置 */
+            width: 310px;
+            height: 260px;
+            z-index: 5;
             transform-style: preserve-3d;
-            /* アニメーション：上昇 → 最前面へ → 展開 */
+            /* 1:上昇, 2:最前面へ, 3:展開（最後は opacity 1 で残る） */
             animation: 
-                slideUp 2s forwards 2.5s, 
-                toFront 0.1s forwards 4.3s; 
+                slideUp 2.2s forwards 2.5s, 
+                bringToFront 0.1s forwards 4.6s;
         }
 
         .card-top {
@@ -54,26 +59,36 @@
             border-top: 1px dashed rgba(45, 64, 46, 0.2);
             box-sizing: border-box; padding: 20px 15px;
             transform-origin: top;
-            transform: rotateX(179deg); /* 背面に折りたたみ */
+            transform: rotateX(179deg);
             backface-visibility: hidden;
-            animation: unfold 1s cubic-bezier(0.4, 0, 0.2, 1) forwards 4.5s;
+            animation: unfold 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 4.8s;
         }
 
-        @keyframes slideUp { to { top: -180px; } } /* 封筒から飛び出す */
-        @keyframes toFront { to { z-index: 20; } } /* 封筒の全てのパーツより前に */
+        @keyframes slideUp { to { transform: translateY(-240px); } }
+        @keyframes bringToFront { to { z-index: 100; } }
         @keyframes unfold { to { transform: rotateX(0deg); } }
 
-        /* --- 封筒ユニット --- */
-        .envelope {
-            position: relative;
-            width: 340px; height: 240px;
+        /* --- 封筒ユニット（これだけを消す） --- */
+        .envelope-wrapper {
+            position: absolute;
+            top: 280px;
+            width: 340px;
+            height: 240px;
             z-index: 10;
-            animation: fadeOutEnv 0.8s forwards 6.5s;
+            /* 案内が広がりきった後に封筒だけフェードアウト */
+            animation: fadeOutEnv 1s forwards 6.5s;
+        }
+
+        /* 底のはみ出しを物理的に隠すマスク */
+        .env-mask {
+            position: absolute; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 1;
         }
 
         .env-back {
             position: absolute; width: 100%; height: 100%;
-            background: var(--forest-green); z-index: 1;
+            background: var(--forest-green);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
@@ -81,7 +96,7 @@
             position: absolute; top: 0; left: 0;
             width: 0; height: 0;
             border-left: 170px solid transparent; border-right: 170px solid transparent;
-            border-top: 130px solid var(--forest-green);
+            border-top: 140px solid var(--forest-green);
             transform-origin: top; z-index: 10;
             animation: openFlap 1s forwards 1s;
         }
@@ -90,48 +105,49 @@
             position: absolute; bottom: 0; left: 0;
             width: 100%; height: 100%;
             background: var(--forest-green);
-            clip-path: polygon(0 40%, 100% 40%, 100% 100%, 0 100%);
+            clip-path: polygon(0 38%, 100% 38%, 100% 100%, 0 100%);
             z-index: 8;
         }
 
         @keyframes openFlap { to { transform: rotateX(180deg); z-index: 1; } }
-        @keyframes fadeOutEnv { to { opacity: 0; transform: translateY(20px); } }
+        @keyframes fadeOutEnv { to { opacity: 0; visibility: hidden; } }
 
         /* --- テキスト装飾 --- */
         .names { font-size: 1.6rem; margin: 15px 0; color: var(--forest-green); font-weight: 600; line-height: 1.2; }
-        .rsvp-form { border-top: 1px solid var(--forest-green); margin-top: 10px; padding-top: 10px; }
-        input, select { width: 100%; margin-bottom: 8px; padding: 8px; border: none; border-bottom: 1px solid var(--forest-green); background: transparent; font-family: inherit; font-size: 0.85rem; box-sizing: border-box; }
-        .btn { background: var(--forest-green); color: var(--ivory); border: none; padding: 12px; font-weight: bold; width: 100%; margin-top: 5px; cursor: pointer; }
+        .rsvp-form { border-top: 1px solid var(--forest-green); margin-top: 10px; padding-top: 10px; text-align: left;}
+        input, select { width: 100%; margin-bottom: 8px; padding: 6px; border: none; border-bottom: 1px solid var(--forest-green); background: transparent; font-family: inherit; font-size: 0.8rem; outline: none; }
+        .btn { background: var(--forest-green); color: var(--ivory); border: none; padding: 12px; font-weight: bold; width: 100%; cursor: pointer; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="viewport">
-        <div class="envelope">
+    <div class="stage">
+        <div class="envelope-wrapper">
             <div class="flap"></div>
-            <div class="env-back"></div>
-            
-            <div class="card-container">
-                <div class="card-top">
-                    <p style="font-size: 0.6rem; letter-spacing: 3px; margin:0;">INVITATION</p>
-                    <div class="names">GENEVIEVE<br>& CHARLES</div>
-                    <p style="font-size: 0.8rem; margin:0;">JUNE 14, 2026</p>
-                </div>
-                <div class="card-bottom">
-                    <div class="rsvp-form">
-                        <p style="text-align: center; font-size: 0.8rem; margin: 0 0 10px 0;">RSVP</p>
-                        <input type="text" placeholder="Your Name">
-                        <select>
-                            <option value="">Attendance</option>
-                            <option value="yes">Accepts with pleasure</option>
-                            <option value="no">Declines with regret</option>
-                        </select>
-                        <button class="btn">SEND RESPONSE</button>
-                    </div>
+            <div class="env-mask">
+                <div class="env-back"></div>
+            </div>
+            <div class="env-front"></div>
+        </div>
+
+        <div class="card-container">
+            <div class="card-top">
+                <p style="font-size: 0.6rem; letter-spacing: 3px; margin:0;">INVITATION</p>
+                <div class="names">GENEVIEVE<br>& CHARLES</div>
+                <p style="font-size: 0.8rem; margin:0;">JUNE 14, 2026</p>
+            </div>
+            <div class="card-bottom">
+                <div class="rsvp-form">
+                    <p style="text-align: center; font-size: 0.7rem; margin: 0 0 5px 0;">RSVP</p>
+                    <input type="text" placeholder="Your Name">
+                    <select>
+                        <option value="">Attendance</option>
+                        <option value="yes">Accepts with pleasure</option>
+                        <option value="no">Declines with regret</option>
+                    </select>
+                    <button class="btn">SEND RESPONSE</button>
                 </div>
             </div>
-
-            <div class="env-front"></div>
         </div>
     </div>
 
