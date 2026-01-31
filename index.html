@@ -16,35 +16,34 @@
             overflow: hidden;
         }
 
-        /* すべてのパーツの基準点 */
+        /* 1. すべてのパーツを束ねる中央の親ボックス */
         .stage {
             position: relative;
-            width: 340px; height: 100vh;
+            width: 340px;
+            height: 240px; /* 封筒のサイズを基準にする */
+            display: flex; justify-content: center; align-items: center;
         }
 
         /* --- 封筒：背面 --- */
         .env-back {
-            position: absolute; bottom: 20%; left: 50%;
-            width: 340px; height: 240px;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--forest-green);
-            transform: translateX(-50%);
             z-index: 1;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-        /* --- 招待状カード --- */
+        /* --- 招待状カード（封筒の背面と前面の間に配置） --- */
         .card-container {
             position: absolute;
-            bottom: 20%; left: 50%;
+            top: 5px; left: 15px; /* 封筒の内側に配置 */
             width: 310px; height: 260px;
-            /* 封筒の底に合わせる (translateXは中心合わせ、translateYは初期位置) */
-            transform: translateX(-50%) translateY(0);
-            z-index: 5;
+            z-index: 5; /* 初期は封筒の中 */
             transform-style: preserve-3d;
-            /* 1:上昇、2:最前面へ、3:展開 */
+            /* 1:上昇、2:最前面へ移動(z-index 100)、3:展開 */
             animation: 
-                slideUp 2s forwards 2.5s, 
-                toFront 0.1s forwards 4.5s;
+                slideUp 2.2s forwards 2.5s, 
+                toFront 0.1s forwards 4.6s;
         }
 
         .card-top {
@@ -53,6 +52,7 @@
             background: var(--ivory);
             border: 1px solid var(--forest-green);
             box-sizing: border-box; padding: 30px 15px; text-align: center;
+            z-index: 2;
         }
 
         .card-bottom {
@@ -65,43 +65,43 @@
             transform-origin: top;
             transform: rotateX(179deg);
             backface-visibility: hidden;
-            animation: unfold 1s cubic-bezier(0.4, 0, 0.2, 1) forwards 4.6s;
+            animation: unfold 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 4.8s;
         }
 
-        /* --- 封筒：前面（V字カット） --- */
+        /* --- 封筒：前面（重要：ここで底のはみ出しを物理的に消します） --- */
         .env-front {
-            position: absolute; bottom: 20%; left: 50%;
-            width: 340px; height: 240px;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             background: var(--forest-green);
-            transform: translateX(-50%);
+            /* 下半分のみを表示し、上半分をV字に空ける。かつ底辺(100%)を越えるものは描画しない */
             clip-path: polygon(0 35%, 100% 35%, 100% 100%, 0 100%);
-            z-index: 10; /* カードを隠す */
+            z-index: 10; /* カード(z-index:5)を隠す */
         }
 
         /* --- 封筒：蓋 --- */
         .flap {
-            position: absolute; bottom: calc(20% + 240px); left: 50%;
+            position: absolute; top: 0; left: 0;
             width: 0; height: 0;
             border-left: 170px solid transparent; border-right: 170px solid transparent;
-            border-top: 140px solid var(--forest-green);
-            transform: translateX(-50%);
-            transform-origin: bottom;
-            z-index: 11;
+            border-top: 130px solid var(--forest-green);
+            transform-origin: top;
+            z-index: 15; /* 最初は一番上 */
             animation: openFlap 1s forwards 1s;
         }
 
-        /* アニメーション */
-        @keyframes openFlap { to { transform: translateX(-50%) rotateX(180deg); z-index: 1; } }
-        /* カードが画面の中央に来るように上昇距離を調整 */
-        @keyframes slideUp { to { transform: translateX(-50%) translateY(-35vh); } }
+        /* --- アニメーション定義 --- */
+        @keyframes openFlap { to { transform: rotateX(180deg); z-index: 1; } }
+        /* カードの上昇距離を -260px に固定（画面中央に案内が残るよう調整） */
+        @keyframes slideUp { to { transform: translateY(-260px); } }
+        /* 上がりきった瞬間に、封筒の前面(z-index 10)を追い越して最前面(100)へ */
         @keyframes toFront { to { z-index: 100; } }
         @keyframes unfold { to { transform: rotateX(0deg); } }
         
         /* 最後に封筒だけを消すグループ */
-        .env-group { animation: fadeOut 0.8s forwards 6.5s; }
+        .env-fade-group { animation: fadeOut 0.8s forwards 6.5s; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-        /* 装飾 */
+        /* 装飾用CSS */
         .names { font-size: 1.6rem; margin: 15px 0; color: var(--forest-green); font-weight: 600; line-height: 1.2; }
         .rsvp-form { border-top: 1px solid var(--forest-green); margin-top: 10px; padding-top: 10px; text-align: left; }
         input, select { width: 100%; margin-bottom: 5px; padding: 8px; border: none; border-bottom: 1px solid var(--forest-green); background: transparent; font-family: inherit; font-size: 0.85rem; box-sizing: border-box; outline: none; }
@@ -131,7 +131,7 @@
             </div>
         </div>
 
-        <div class="env-group">
+        <div class="env-fade-group">
             <div class="env-back"></div>
             <div class="env-front"></div>
             <div class="flap"></div>
