@@ -67,18 +67,18 @@
             background-position: center;
         }
 
-        /* 【重要】文字位置とサイズの修正 */
+        /* 【修正箇所】topを22%から28%に下げ、文字の間隔も少し調整 */
         .yc-name {
             position: absolute;
-            top: 22%; /* さらに上に上げて白い部分のど真ん中に配置 */
+            top: 28%; /* 位置を少し下げて白い部分の中央へ */
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Water Brush', cursive;
-            font-size: 2.2rem; /* サイズを小さくして、はみ出さないように修正 */
+            font-size: 2.1rem; /* はまりを良くするため僅かに縮小 */
             color: var(--black);
             white-space: nowrap;
             pointer-events: none;
-            text-shadow: 0 0 3px rgba(255,255,255,0.5); /* 視認性を確保 */
+            letter-spacing: 1px; /* 文字同士が詰まりすぎないよう調整 */
         }
 
         .welcome-text { 
