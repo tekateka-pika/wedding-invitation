@@ -4,152 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Wedding Invitation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Water+Brush&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Serif+JP:wght@300&display=swap" rel="stylesheet">
     <style>
-        :root { --black: #1a1a1a; --white: #ffffff; }
+        :root { 
+            --forest-green: #2D402E; 
+            --pure-white: #FFFFFF; 
+        }
         
         body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--white); 
-            font-family: 'Cormorant Garamond', serif; 
-            display: flex; justify-content: center; align-items: center; 
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--pure-white); 
+            font-family: 'Cormorant Garamond', serif;
+            display: flex; justify-content: center; align-items: center;
             overflow: hidden;
-            /* タップ時の青い枠を消す */
-            -webkit-tap-highlight-color: transparent;
         }
 
+        /* 外枠の設定 */
         .outer-frame {
-            position: relative; 
-            width: calc(100% - 40px); 
-            height: calc(100% - 40px);
-            max-width: 400px; 
-            max-height: 700px; 
-            border: 1px solid var(--black);
-            background: var(--white); 
-            overflow: hidden; 
-        }
-
-        .invitation-container { 
-            width: 100%;
-            height: 100%;
-            position: relative; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-        }
-
-        /* --- Welcome画面 (最前面) --- */
-        #welcomeScreen {
-            position: absolute; 
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: flex; 
-            flex-direction: column;
-            justify-content: center; 
-            align-items: center; 
-            background: var(--white);
-            z-index: 9999; /* 確実に一番上に配置 */
-            cursor: pointer;
-            transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-        }
-
-        .fan-box {
             position: relative;
-            width: 340px; height: 220px;
-            margin-bottom: 10px;
-            pointer-events: none; /* 下の画面へのタップを邪魔しない */
+            width: calc(100% - 40px);
+            height: calc(100% - 40px);
+            max-width: 400px;
+            max-height: 700px;
+            border: 3px solid var(--forest-green); /* フォレストグリーンの外枠 */
+            background-color: var(--pure-white);
+            overflow: hidden;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
-        .fan-img {
-            width: 100%; height: 100%;
-            background-image: url('fan.jfif'); 
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+        /* 内部コンテナ（スクロール用） */
+        .invitation-container {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
-        .yc-name {
+        /* --- Welcome画面 --- */
+        .welcome-screen {
             position: absolute;
-            top: 31%; left: 50%;
-            transform: translateX(-50%);
-            font-family: 'Water Brush', cursive;
-            font-size: 2.1rem; 
-            color: var(--black);
-            white-space: nowrap;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--pure-white);
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            cursor: pointer;
+            text-align: center;
+            padding: 20px;
+            z-index: 10;
         }
 
-        .welcome-text { 
-            font-size: 1.6rem; color: var(--black); letter-spacing: 5px; 
-            text-align: center; margin-top: 15px; pointer-events: none;
+        .welcome-text {
+            font-size: 2rem;
+            color: var(--forest-green);
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
         }
 
-        .tap-hint { 
-            margin-top: 30px; font-size: 0.7rem; letter-spacing: 2px; opacity: 0.5; 
-            animation: blink 2s infinite; pointer-events: none;
+        .welcome-photo {
+            width: 80%;
+            aspect-ratio: 3/4;
+            background-image: url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1000');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--forest-green);
+            filter: sepia(20%);
         }
 
-        @keyframes blink { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.1; } }
+        /* --- Detail画面 --- */
+        .detail-screen {
+            padding: 60px 30px;
+            background-color: var(--pure-white);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
 
-        /* --- Detail画面 (背面) --- */
-        #detailScreen { 
-            display: none; /* 最初は存在させない */
+        .detail-title {
+            font-size: 1.8rem;
+            color: var(--forest-green);
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--forest-green);
+            display: inline-block;
             width: 100%;
-            min-height: 100%;
-        }
-        
-        .detail-hero-img {
-            width: 100%; height: 240px;
-            background-image: url('wdpic.jpeg'); 
-            background-size: cover; background-position: center;
-            background-color: #f0f0f0;
+            padding-bottom: 10px;
         }
 
-        .content-body { padding: 40px 25px; text-align: center; }
-        .section-title { font-size: 1.6rem; border-bottom: 1px solid var(--black); padding-bottom: 10px; margin-bottom: 35px; }
-        .info-block { margin-bottom: 30px; }
-        .info-block h3 { font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.7; }
-        .info-block p { font-size: 1.1rem; line-height: 1.6; margin: 0; }
+        .detail-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
 
-        .rsvp-form { margin-top: 50px; border-top: 1px solid var(--black); padding-top: 40px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--black); background: transparent; box-sizing: border-box; }
-        .btn { background: var(--black); color: var(--white); border: none; padding: 18px; width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
+        .detail-section h3 {
+            font-size: 1.1rem;
+            color: var(--forest-green);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
 
+        .detail-section p {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        /* RSVPフォーム */
+        .rsvp-form {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid var(--forest-green);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--forest-green);
+            background-color: var(--pure-white);
+            font-family: inherit;
+            box-sizing: border-box;
+            color: var(--forest-green);
+        }
+
+        .btn {
+            background-color: var(--forest-green);
+            color: var(--pure-white);
+            padding: 18px;
+            border: none;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        /* アニメーション用クラス */
+        .welcome-screen.hidden {
+            transform: translateY(-100%);
+        }
+        .detail-screen.visible {
+            opacity: 1;
+        }
+
+        .tap-hint {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: var(--forest-green);
+            letter-spacing: 1px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
     </style>
 </head>
 <body>
 
     <div class="outer-frame">
-        <div class="invitation-container" id="scrollContainer">
+        <div class="invitation-container" id="invitationContainer">
             
-            <div id="welcomeScreen" onclick="openInvitation()">
-                <div class="fan-box">
-                    <div class="fan-img"></div>
-                    <div class="yc-name">Y & C</div>
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-text">
+                    WELCOME TO<br>OUR WEDDING
                 </div>
-                <div class="welcome-text">WELCOME TO<br>OUR WEDDING</div>
-                <div class="tap-hint">TAP TO OPEN</div>
+                <div class="welcome-photo"></div>
+                <div class="tap-hint">Tap to Open</div>
             </div>
 
-            <div id="detailScreen">
-                <div class="detail-hero-img"></div>
-                <div class="content-body">
-                    <h2 class="section-title">Invitation</h2>
-                    <div class="info-block">
-                        <h3>Date</h3>
-                        <p>Saturday, June 14, 2026<br>3:00 PM</p>
-                    </div>
-                    <div class="info-block">
-                        <h3>Venue</h3>
-                        <p>The Grand Heritage<br>Aoyama, Tokyo</p>
-                    </div>
-                    <div class="rsvp-form">
-                        <input type="text" placeholder="Your Name">
-                        <select>
-                            <option value="" disabled selected>Attendance</option>
-                            <option value="yes">Joyfully Accepts</option>
-                            <option value="no">Regretfully Declines</option>
-                        </select>
-                        <button class="btn">SEND RESPONSE</button>
-                    </div>
+            <div class="detail-screen" id="detailScreen">
+                <h2 class="detail-title">Invitation</h2>
+
+                <div class="detail-section">
+                    <h3>The Day</h3>
+                    <p>Saturday, June 14, 2026<br>3:00 PM - Ceremony</p>
+                </div>
+
+                <div class="detail-section">
+                    <h3>The Place</h3>
+                    <p>Grand View Garden<br>456 Rose Lane, Tokyo</p>
+                </div>
+
+                <div class="rsvp-form">
+                    <h3 style="text-align: center; letter-spacing: 3px;">RSVP</h3>
+                    <p style="text-align: center; font-size: 0.8rem; margin-bottom: 20px;">Please respond by May 1st</p>
+                    <input type="text" placeholder="Full Name">
+                    <select>
+                        <option value="" disabled selected>Will you join us?</option>
+                        <option value="yes">Joyfully Accepts</option>
+                        <option value="no">Regretfully Declines</option>
+                    </select>
+                    <textarea placeholder="Message to the Couple" rows="3"></textarea>
+                    <button class="btn">SEND RESPONSE</button>
                 </div>
             </div>
 
@@ -157,22 +210,12 @@
     </div>
 
     <script>
-        // 最もシンプルで確実な切り替え関数
-        function openInvitation() {
-            const welcome = document.getElementById('welcomeScreen');
-            const detail = document.getElementById('detailScreen');
-            
-            // Welcome画面を上にスライドさせて消す
-            welcome.style.transform = 'translateY(-100%)';
-            welcome.style.opacity = '0';
-            
-            // 0.5秒後に完全に非表示にし、詳細画面を表示する
-            setTimeout(() => {
-                welcome.style.display = 'none';
-                detail.style.display = 'block';
-                document.getElementById('scrollContainer').scrollTop = 0;
-            }, 600);
-        }
+        document.getElementById('welcomeScreen').addEventListener('click', function() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('detailScreen').classList.add('visible');
+            document.getElementById('invitationContainer').scrollTop = 0;
+        });
     </script>
+
 </body>
 </html>
