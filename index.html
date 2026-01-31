@@ -16,34 +16,65 @@
             overflow: hidden;
         }
 
-        /* 1. 基準となるステージ（ここですべての座標を統一） */
+        /* ステージ：中央固定 */
         .stage {
             position: relative;
-            width: 340px; height: 240px; /* 封筒サイズに固定 */
+            width: 340px; height: 240px;
         }
 
-        /* --- 封筒：背中 (一番奥) --- */
+        /* 1. 封筒の「ポケット」：ここより下にはみ出すものは表示しない */
+        .envelope-pocket {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; /* これが「底」の役割を果たし、カードのはみ出しを消します */
+            z-index: 10;
+        }
+
+        /* 封筒：背面 */
         .env-back {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             background: var(--forest-green);
             z-index: 1;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
 
-        /* --- 招待状カード (真ん中に配置) --- */
+        /* 招待状カード：最初はポケットの奥深く（下）に配置 */
         .card-container {
             position: absolute;
-            top: 5px; left: 15px;
+            top: 100px; /* 封筒の底の方に沈める */
+            left: 15px;
             width: 310px; height: 260px;
-            z-index: 2; /* 背中(1)より前、前面(3)より後ろ */
+            z-index: 5;
             transform-style: preserve-3d;
-            /* 1:上昇、2:最前面(100)へ、3:パカッと開く */
+            /* 1:上昇、2:最前面へ、3:展開 */
             animation: 
                 slideUp 2.5s forwards 2.5s, 
                 toFront 0.1s forwards 4.9s;
         }
 
+        /* 封筒：前面（ポケットの表側） */
+        .env-front {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--forest-green);
+            /* V字カット：この隙間からだけカードが見える */
+            clip-path: polygon(0 40%, 50% 60%, 100% 40%, 100% 100%, 0 100%);
+            z-index: 10;
+        }
+
+        /* 2. 封筒の「蓋」：ポケットの外側に配置 */
+        .flap {
+            position: absolute; top: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 170px solid transparent; border-right: 170px solid transparent;
+            border-top: 135px solid var(--forest-green);
+            transform-origin: top;
+            z-index: 20;
+            animation: openFlap 1.2s forwards 1s;
+        }
+
+        /* カードの各面 */
         .card-top {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
@@ -52,7 +83,6 @@
             box-sizing: border-box; padding: 30px 15px; text-align: center;
             z-index: 2;
         }
-
         .card-bottom {
             position: absolute; top: 100%; left: 0;
             width: 100%; height: 100%;
@@ -66,50 +96,16 @@
             animation: unfold 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards 5.1s;
         }
 
-        /* --- 封筒：前面 (カードを隠す「ポケット」の役割) --- */
-        .env-front {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--forest-green);
-            z-index: 3; /* カードを物理的に覆い隠す */
-            /* 封筒の口をV字にカット。底辺(100%)までカバーしてはみ出しを防ぐ */
-            clip-path: polygon(0 35%, 50% 50%, 100% 35%, 100% 100%, 0 100%);
-        }
-
-        /* --- 封筒：蓋 --- */
-        .flap {
-            position: absolute; top: 0; left: 0;
-            width: 0; height: 0;
-            border-left: 170px solid transparent; border-right: 170px solid transparent;
-            border-top: 135px solid var(--forest-green);
-            transform-origin: top;
-            z-index: 4; /* 最初は最前面 */
-            animation: openFlap 1.2s forwards 1s;
-        }
-
-        /* --- アニメーション定義 --- */
-        /* 1. 蓋が開いて奥へ移動 */
-        @keyframes openFlap { 
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(180deg); z-index: 0; } 
-        }
-        /* 2. カードの上昇 */
-        @keyframes slideUp { 
-            to { transform: translateY(-260px); } 
-        }
-        /* 3. 上がりきった瞬間、封筒を追い越して最前面へ */
-        @keyframes toFront { 
-            to { z-index: 100; } 
-        }
-        /* 4. 二つ折り部分がパカッと開く */
-        @keyframes unfold { 
-            to { transform: rotateX(0deg); } 
-        }
+        /* アニメーション */
+        @keyframes openFlap { to { transform: rotateX(180deg); z-index: 0; } }
+        /* 上昇距離：封筒の底から、画面中央へ */
+        @keyframes slideUp { to { transform: translateY(-300px); } }
+        /* 展開直前に、envelope-pocket（z-index 10）を突き抜けて最前面（100）へ */
+        @keyframes toFront { to { z-index: 100; } }
+        @keyframes unfold { to { transform: rotateX(0deg); } }
         
-        /* 最後に封筒全体を消す */
-        .env-group { 
-            animation: fadeOut 0.8s forwards 6.8s; 
-        }
+        /* 案内状以外を消去 */
+        .env-fade-group { animation: fadeOut 0.8s forwards 6.8s; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
         /* 装飾 */
@@ -142,10 +138,13 @@
             </div>
         </div>
 
-        <div class="env-group">
-            <div class="env-back"></div>
-            <div class="env-front"></div>
+        <div class="env-fade-group">
             <div class="flap"></div>
+            
+            <div class="envelope-pocket">
+                <div class="env-back"></div>
+                <div class="env-front"></div>
+            </div>
         </div>
     </div>
 
