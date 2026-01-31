@@ -50,7 +50,6 @@
             z-index: 10;
         }
 
-        /* 扇子コンテナ */
         .fan-box {
             position: relative;
             width: 340px; 
@@ -67,18 +66,18 @@
             background-position: center;
         }
 
-        /* 【修正箇所】topを22%から28%に下げ、文字の間隔も少し調整 */
+        /* 文字位置をさらに下げて「白い部分」に最適化 */
         .yc-name {
             position: absolute;
-            top: 28%; /* 位置を少し下げて白い部分の中央へ */
+            top: 31%; /* 前回の28%からさらに下げて中央へ */
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Water Brush', cursive;
-            font-size: 2.1rem; /* はまりを良くするため僅かに縮小 */
+            font-size: 2.1rem; 
             color: var(--black);
             white-space: nowrap;
             pointer-events: none;
-            letter-spacing: 1px; /* 文字同士が詰まりすぎないよう調整 */
+            letter-spacing: 1px;
         }
 
         .welcome-text { 
@@ -107,10 +106,11 @@
             min-height: 100%; 
         }
         
+        /* 【修正箇所】イメージ画像を「変更済み.jpeg」に置き換え */
         .detail-hero-img {
             width: 100%; 
             height: 240px;
-            background-image: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=1000');
+            background-image: url('変更済み.jpeg'); 
             background-size: cover; 
             background-position: center;
         }
@@ -181,8 +181,4 @@
         document.getElementById('welcomeScreen').addEventListener('click', function() {
             this.classList.add('hide');
             document.getElementById('detailScreen').classList.add('show');
-            document.getElementById('scrollContainer').scrollTop = 0;
-        });
-    </script>
-</body>
-</html>
+            document
