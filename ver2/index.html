@@ -3,233 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wedding Invitation (Fan Theme)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+    <title>Wedding Invitation - Fan Animation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Water+Brush&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --primary-black: #000000; 
-            --pure-white: #FFFFFF; 
-        }
+        :root { --black: #000000; --white: #FFFFFF; }
         
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--pure-white); 
+            background-color: var(--white); 
             font-family: 'Cormorant Garamond', serif;
             display: flex; justify-content: center; align-items: center;
             overflow: hidden;
         }
 
-        /* 外枠の設定 */
+        /* 外枠 */
         .outer-frame {
             position: relative;
             width: calc(100% - 40px);
             height: calc(100% - 40px);
             max-width: 400px;
             max-height: 700px;
-            border: 2px solid var(--primary-black); /* 黒い外枠 */
-            background-color: var(--pure-white);
+            border: 2px solid var(--black);
+            background-color: var(--white);
             overflow: hidden;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
         }
 
-        /* 内部コンテナ（スクロール用） */
-        .invitation-container {
-            flex: 1;
-            position: relative;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+        .invitation-container { flex: 1; position: relative; overflow-y: auto; }
 
-        /* --- Welcome画面 --- */
+        /* Welcome画面 */
         .welcome-screen {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--pure-white);
-            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-            cursor: pointer;
-            text-align: center;
-            padding: 20px;
-            z-index: 10;
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background-color: var(--white);
+            transition: transform 0.8s ease-in-out;
+            cursor: pointer; z-index: 10;
         }
 
-        .fan-illustration {
-            width: 80%; /* 扇子の幅 */
-            max-width: 250px;
-            height: auto;
-            margin-bottom: 30px;
+        /* 扇子のアニメーション構造 */
+        .fan-container {
+            position: relative;
+            width: 250px;
+            height: 150px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
         }
-        .fan-illustration svg {
-            width: 100%;
-            height: auto;
+
+        /* 扇子の骨/紙の部分 */
+        .fan-leaf {
+            position: absolute;
+            width: 130px;
+            height: 150px;
+            background-color: var(--black);
+            clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+            transform-origin: bottom center;
+            /* 最初は閉じた状態（真ん中に重なっている） */
+            transform: rotate(0deg);
+            transition: transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex;
+            justify-content: center;
         }
-        .fan-illustration text {
-            font-family: 'Dancing Script', cursive; /* 筆記体フォント */
-            font-size: 50px; /* 文字のサイズ */
-            fill: var(--pure-white); /* 扇子の色に合わせて白 */
-            text-anchor: middle;
-            dominant-baseline: central;
+
+        /* 各葉の配置（開いた時の角度） */
+        .fan-leaf:nth-child(1) { transition-delay: 0.1s; }
+        .fan-leaf:nth-child(2) { transition-delay: 0.15s; }
+        .fan-leaf:nth-child(3) { transition-delay: 0.2s; }
+        .fan-leaf:nth-child(4) { transition-delay: 0.25s; }
+        .fan-leaf:nth-child(5) { transition-delay: 0.3s; }
+
+        /* アニメーション開始クラス */
+        .fan-container.open .fan-leaf:nth-child(1) { transform: rotate(-60deg); }
+        .fan-container.open .fan-leaf:nth-child(2) { transform: rotate(-30deg); }
+        .fan-container.open .fan-leaf:nth-child(3) { transform: rotate(0deg); }
+        .fan-container.open .fan-leaf:nth-child(4) { transform: rotate(30deg); }
+        .fan-container.open .fan-leaf:nth-child(5) { transform: rotate(60deg); }
+
+        /* Y&C の文字（Water Brushフォント） */
+        .yc-text {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--white);
+            font-family: 'Water Brush', cursive;
+            font-size: 3rem;
+            white-space: nowrap;
+            z-index: 15;
+            opacity: 0;
+            transition: opacity 1s ease 1s;
         }
+        .fan-container.open .yc-text { opacity: 1; }
 
         .welcome-text {
-            font-size: 1.8rem;
-            color: var(--primary-black);
-            font-weight: 600;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-            line-height: 1.2;
+            font-size: 1.5rem;
+            color: var(--black);
+            letter-spacing: 3px;
+            text-align: center;
         }
 
-        .tap-hint {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: var(--primary-black);
-            letter-spacing: 1px;
-            animation: blink 2s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* --- Detail画面 --- */
+        /* 詳細画面 */
         .detail-screen {
             padding: 60px 30px;
-            background-color: var(--pure-white);
+            background-color: var(--white);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.5s;
         }
 
-        .detail-title {
-            font-size: 1.8rem;
-            color: var(--primary-black);
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--primary-black);
-            display: inline-block;
-            width: 100%;
-            padding-bottom: 10px;
-        }
+        /* フォーム類 */
+        .rsvp-form { margin-top: 40px; border-top: 1px solid var(--black); padding-top: 20px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--black); background: transparent; font-family: inherit; }
+        .btn { background: var(--black); color: var(--white); border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; }
 
-        .detail-section {
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .detail-section h3 {
-            font-size: 1.1rem;
-            color: var(--primary-black);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 15px;
-        }
-
-        .detail-section p {
-            font-size: 1rem;
-            color: #333;
-            line-height: 1.8;
-        }
-
-        /* RSVPフォーム */
-        .rsvp-form {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 2px solid var(--primary-black);
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid var(--primary-black);
-            background-color: var(--pure-white);
-            font-family: inherit;
-            box-sizing: border-box;
-            color: var(--primary-black);
-        }
-
-        .btn {
-            background-color: var(--primary-black);
-            color: var(--pure-white);
-            padding: 18px;
-            border: none;
-            width: 100%;
-            font-size: 1rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            cursor: pointer;
-        }
-
-        /* アニメーション用クラス */
-        .welcome-screen.hidden {
-            transform: translateY(-100%);
-        }
-        .detail-screen.visible {
-            opacity: 1;
-        }
+        /* 画面遷移用 */
+        .welcome-screen.hide { transform: translateY(-100%); }
+        .detail-screen.show { opacity: 1; }
     </style>
 </head>
 <body>
 
     <div class="outer-frame">
-        <div class="invitation-container" id="invitationContainer">
+        <div class="invitation-container">
             
             <div class="welcome-screen" id="welcomeScreen">
-                <div class="fan-illustration">
-                    <svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M150 15 C 250 10, 290 80, 290 150 L 10 150 C 10 80, 50 10, 150 15 Z" fill="var(--primary-black)" />
-                        
-                        <line x1="150" y1="15" x2="150" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="200" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="100" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="230" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="70" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="260" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="40" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="280" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        <line x1="150" y1="15" x2="20" y2="150" stroke="var(--pure-white)" stroke-width="1"/>
-                        
-                        <circle cx="150" cy="150" r="10" fill="var(--primary-black)" stroke="var(--pure-white)" stroke-width="1"/>
-
-                        <text x="150" y="75" font-size="50px" font-family="'Dancing Script', cursive" fill="var(--pure-white)">Y & C</text>
-                    </svg>
+                <div class="fan-container" id="fanContainer">
+                    <div class="fan-leaf"></div>
+                    <div class="fan-leaf"></div>
+                    <div class="fan-leaf"></div>
+                    <div class="fan-leaf"></div>
+                    <div class="fan-leaf"></div>
+                    <div class="yc-text">Y & C</div>
                 </div>
-
-                <div class="welcome-text">
-                    WELCOME TO<br>OUR WEDDING
-                </div>
-                <div class="tap-hint">Tap to Open</div>
+                <div class="welcome-text">WELCOME TO OUR WEDDING</div>
+                <p style="font-size: 0.7rem; margin-top: 20px; letter-spacing: 2px;">Tap to Open</p>
             </div>
 
             <div class="detail-screen" id="detailScreen">
-                <h2 class="detail-title">Invitation Details</h2>
-
-                <div class="detail-section">
-                    <h3>Date & Time</h3>
-                    <p>Saturday, June 14, 2026<br>Ceremony: 3:00 PM</p>
+                <h2 style="text-align: center; border-bottom: 1px solid #000; padding-bottom: 10px;">Wedding Details</h2>
+                <div style="text-align: center; margin: 30px 0;">
+                    <p>Saturday, June 14, 2026</p>
+                    <p>At the Grand Heritage</p>
                 </div>
-
-                <div class="detail-section">
-                    <h3>Venue</h3>
-                    <p>The Grand Ballroom<br>123 Main Street, Cityville</p>
-                </div>
-
                 <div class="rsvp-form">
-                    <h3 style="text-align: center; letter-spacing: 3px;">RSVP</h3>
-                    <p style="text-align: center; font-size: 0.8rem; margin-bottom: 20px;">Please respond by May 1st</p>
-                    <input type="text" placeholder="Full Name">
-                    <select>
-                        <option value="" disabled selected>Will you join us?</option>
-                        <option value="yes">Joyfully Accepts</option>
-                        <option value="no">Regretfully Declines</option>
-                    </select>
-                    <textarea placeholder="Message to the Couple" rows="3"></textarea>
+                    <input type="text" placeholder="Your Name">
+                    <select><option>Attendance</option><option>Accepts</option><option>Declines</option></select>
                     <button class="btn">SEND RESPONSE</button>
                 </div>
             </div>
@@ -238,10 +157,15 @@
     </div>
 
     <script>
-        document.getElementById('welcomeScreen').addEventListener('click', function() {
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('detailScreen').classList.add('visible');
-            document.getElementById('invitationContainer').scrollTop = 0;
+        // ページ読み込み1秒後に扇子を開く
+        window.onload = () => {
+            document.getElementById('fanContainer').classList.add('open');
+        };
+
+        // タップで画面遷移
+        document.getElementById('welcomeScreen').addEventListener('click', () => {
+            document.getElementById('welcomeScreen').classList.add('hide');
+            document.getElementById('detailScreen').classList.add('show');
         });
     </script>
 
