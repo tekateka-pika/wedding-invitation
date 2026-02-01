@@ -101,38 +101,39 @@
         .detail-value { font-size: 1.3rem; line-height: 1.5; color: var(--black); margin: 0; font-weight: 400; }
         
         .jp-address { 
-            font-size: 0.9rem; 
+            font-size: 0.95rem; 
             font-family: "Hiragino Mincho ProN", "MS Mincho", serif; 
-            margin-top: 10px; 
+            margin-top: 8px; 
             line-height: 1.8; color: #333;
         }
 
-        /* 会場画像リンクのスタイル */
-        .venue-link-container { 
-            margin: 25px auto 0; 
-            width: 100%; 
-            position: relative;
+        /* Access情報のスタイル */
+        .access-info {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--black);
+            font-family: "Hiragino Mincho ProN", serif;
         }
-        .venue-img {
-            width: 100%;
-            height: auto;
-            border: 1px solid #eee;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: block;
+
+        .map-btn-container { 
+            margin: 30px auto 0; 
+            width: 100%; 
         }
         .map-btn {
             display: block;
-            margin-top: 15px;
-            padding: 15px;
+            padding: 18px;
             border: 1px solid var(--black);
-            color: var(--black);
+            color: var(--white);
+            background-color: var(--black);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             letter-spacing: 2px;
             font-weight: 600;
+            transition: opacity 0.3s;
         }
+        .map-btn:active { opacity: 0.7; }
 
-        .rsvp-form { margin-top: 50px; border-top: 1px solid var(--black); padding-top: 50px; text-align: left; }
+        .rsvp-form { margin-top: 60px; border-top: 1px solid var(--black); padding-top: 50px; text-align: left; }
         .rsvp-deadline { text-align: center; font-size: 0.9rem; color: var(--black); margin-bottom: 40px; line-height: 1.6; font-family: "Hiragino Mincho ProN", serif; }
         
         .rsvp-form label { display: block; font-size: 0.8rem; margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
@@ -184,12 +185,14 @@
                             <p class="detail-value">ZENBO SEINEI</p>
                             <p class="jp-address">禅坊 靖寧<br>〒656-2301 兵庫県淡路市楠本 字場中2594-5</p>
                             
-                            <div class="venue-link-container">
-                                <a href="https://maps.app.goo.gl/N2z59LWhV2R6T9y89" target="_blank" style="text-decoration:none;">
-                                    <img src="https://images.unsplash.com/photo-1518005020480-47432092109e?auto=format&fit=crop&q=80&w=800" alt="ZENBO SEINEI" class="venue-img">
-                                    <div class="map-btn">VIEW ON GOOGLE MAPS</div>
+                            <div class="access-info">
+                                ACCESS：淡路ICより車で5分
+                            </div>
+
+                            <div class="map-btn-container">
+                                <a href="https://maps.google.com/?q=禅坊+靖寧" target="_blank" class="map-btn">
+                                    VIEW ON GOOGLE MAPS
                                 </a>
-                                <p style="font-size: 0.65rem; margin-top: 10px; opacity: 0.6; font-family:serif;">※画像またはボタンをタップすると地図が開きます</p>
                             </div>
                         </div>
                     </div>
