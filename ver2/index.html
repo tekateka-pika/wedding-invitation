@@ -107,7 +107,6 @@
             line-height: 1.8; color: #333;
         }
 
-        /* 注釈のスタイル（RSVPのヒントと共通化） */
         .input-hint, .detail-note {
             display: block;
             font-size: 0.7rem;
@@ -135,12 +134,12 @@
         }
         .map-btn:active { opacity: 0.7; }
 
-        /* RSVPフォーム */
+        /* --- RSVPフォーム --- */
         .rsvp-form { margin-top: 60px; border-top: 1px solid var(--black); padding-top: 50px; text-align: left; }
         .rsvp-deadline { text-align: center; font-size: 0.9rem; color: var(--black); margin-bottom: 40px; line-height: 1.6; font-family: "Hiragino Mincho ProN", serif; }
         
         .rsvp-form label { display: block; font-size: 0.8rem; margin-bottom: 8px; letter-spacing: 1px; font-weight: 600; }
-
+        
         .name-row { display: flex; gap: 10px; width: 100%; margin-bottom: 25px; }
         .name-field { flex: 1; }
 
@@ -154,6 +153,9 @@
             width: 100%; font-weight: bold; cursor: pointer; letter-spacing: 2px; margin-top: 10px;
             font-family: var(--didot);
         }
+
+        /* --- 送信後のメッセージ表示用 --- */
+        #thankYouMessage { display: none; padding: 60px 0; text-align: center; }
 
     </style>
 </head>
@@ -206,36 +208,44 @@
                         </div>
                     </div>
 
-                    <div class="rsvp-form">
+                    <div class="rsvp-form" id="rsvpSection">
                         <p class="rsvp-deadline">大変お手数ですが、<br>3月1日(日)までにご回答をお願いします</p>
                         
-                        <label>Name (Latin)</label>
-                        <span class="input-hint">※お名前はローマ字でご入力ください</span>
-                        
-                        <div class="name-row">
-                            <div class="name-field"><input type="text" placeholder="Last Name"></div>
-                            <div class="name-field"><input type="text" placeholder="First Name"></div>
-                        </div>
+                        <form id="weddingForm">
+                            <label>Name (Latin)</label>
+                            <span class="input-hint">※お名前はローマ字でご入力ください</span>
+                            
+                            <div class="name-row">
+                                <div class="name-field"><input type="text" id="lastName" placeholder="Last Name" required></div>
+                                <div class="name-field"><input type="text" id="firstName" placeholder="First Name" required></div>
+                            </div>
 
-                        <label>Attendance</label>
-                        <select>
-                            <option value="" disabled selected>ご出席についてお選びください</option>
-                            <option value="yes">ご出席</option>
-                            <option value="no">ご欠席</option>
-                        </select>
+                            <label>Attendance</label>
+                            <select id="attendance" required>
+                                <option value="" disabled selected>ご出席についてお選びください</option>
+                                <option value="ご出席">ご出席</option>
+                                <option value="ご欠席">ご欠席</option>
+                            </select>
 
-                        <label>Stay</label>
-                        <select>
-                            <option value="" disabled selected>宿泊についてお選びください</option>
-                            <option value="stay-yes">宿泊可能</option>
-                            <option value="stay-no">宿泊不可</option>
-                        </select>
+                            <label>Stay</label>
+                            <select id="stay" required>
+                                <option value="" disabled selected>宿泊についてお選びください</option>
+                                <option value="宿泊可能">宿泊可能</option>
+                                <option value="宿泊不可">宿泊不可</option>
+                            </select>
 
-                        <label>Allergy</label>
-                        <textarea placeholder="アレルギーがある場合はご入力ください"></textarea>
+                            <label>Allergy</label>
+                            <textarea id="allergy" placeholder="アレルギーがある場合はご入力ください"></textarea>
 
-                        <button class="btn">SEND RESPONSE</button>
+                            <button type="submit" class="btn" id="submitBtn">SEND RESPONSE</button>
+                        </form>
                     </div>
+
+                    <div id="thankYouMessage">
+                        <h3 style="font-size: 1.5rem; letter-spacing: 2px;">Thank You</h3>
+                        <p class="input-hint" style="font-size: 0.9rem; color: #1a1a1a;">ご回答ありがとうございました。</p>
+                    </div>
+
                     <div style="height: 100px;"></div>
                 </div>
             </div>
@@ -254,6 +264,48 @@
                 document.getElementById('scrollContainer').scrollTop = 0;
             }, 600);
         }
+
+        // --- Googleスプレッドシート(GAS)連携スクリプト ---
+        document.getElementById('weddingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            var submitBtn = document.getElementById('submitBtn');
+            var originalBtnText = submitBtn.innerText;
+            submitBtn.innerText = "SENDING...";
+            submitBtn.disabled = true;
+
+            // ★ここにGASで発行したウェブアプリのURLを貼り付けてください
+            var GAS_URL = "https://script.google.com/macros/s/AKfycbxMvRAyWQHWtjc8p8TLFb46KDIVY9orD9TnhST4r545Os9xxxmV4-Un4eYWNKG0EIri/exec";
+
+            var formData = {
+                lastName: document.getElementById('lastName').value,
+                firstName: document.getElementById('firstName').value,
+                attendance: document.getElementById('attendance').value,
+                stay: document.getElementById('stay').value,
+                allergy: document.getElementById('allergy').value
+            };
+
+            fetch(GAS_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(formData)
+            }).then(function() {
+                // 送信成功時
+                document.getElementById('rsvpSection').style.display = 'none';
+                document.getElementById('thankYouMessage').style.display = 'block';
+                // メッセージまでスクロール
+                document.getElementById('scrollContainer').scrollTo({
+                    top: document.getElementById('thankYouMessage').offsetTop,
+                    behavior: 'smooth'
+                });
+            }).catch(function(error) {
+                // エラー時
+                console.error("Error!", error);
+                alert("送信中にエラーが発生しました。インターネット接続を確認し、もう一度お試しください。");
+                submitBtn.innerText = originalBtnText;
+                submitBtn.disabled = false;
+            });
+        });
     </script>
 </body>
 </html>
