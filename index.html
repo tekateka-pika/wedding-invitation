@@ -100,7 +100,7 @@
         .detail-label { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; display: block; }
         .detail-value { font-size: 1.3rem; line-height: 1.5; color: var(--black); margin: 0; font-weight: 400; }
         
-        .jp-address, .venue-name { 
+        .jp-address { 
             font-size: 0.95rem; 
             font-family: "Hiragino Mincho ProN", "MS Mincho", serif; 
             margin-top: 8px; 
@@ -186,7 +186,7 @@
 
                         <div class="detail-item">
                             <span class="detail-label">VENUE</span>
-                            <p class="detail-value" style="font-family: 'Hiragino Mincho ProN', serif;">禅坊 清寧 -ZENBO SEINEI-</p>
+                            <p class="detail-value">ZENBO SEINEI</p>
                             <p class="jp-address">〒656-2301 兵庫県淡路市楠本 字場中2594-5</p>
                         </div>
 
@@ -272,7 +272,6 @@
             submitBtn.innerText = "SENDING...";
             submitBtn.disabled = true;
 
-            // GASのURLをセット済みです
             var GAS_URL = "https://script.google.com/macros/s/AKfycbxMvRAyWQHWtjc8p8TLFb46KDIVY9orD9TnhST4r545Os9xxxmV4-Un4eYWNKG0EIri/exec";
 
             var formData = {
